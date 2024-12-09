@@ -1,0 +1,119 @@
+services:
+  postgres:
+    image: postgres:12
+    container_name: postgres
+    volumes:
+      - potgresql-data:/var/lib/postgresql/data
+    env_file:
+      - .env
+    ports:
+      - "5432:5432"
+#    networks:
+#      - smbt_postgres
+  admin:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: bot_admin:latest
+    container_name: admin_cont
+    volumes:
+      - media_volume:/app/admin_panel/media:rw
+    depends_on:
+      - postgres
+      - redis
+    env_file:
+      - .env
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    ports:
+      - "8000:8000"
+    restart: always
+
+    command: >
+      bash -c "python manage.py collectstatic --noinput && python manage.py makemigrations 
+      && python manage.py migrate &&  python manage.py runserver 0.0.0.0:8000"
+
+  bot_market:
+    build:
+      context: ./bot_market
+      dockerfile: Dockerfile
+    image: bot_market:latest
+    container_name: bot_market_cont
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+    depends_on:
+      - postgres
+    volumes:
+      - media_volume:/app:rw
+    env_file:
+      - .env
+    command: >
+      bash -c "python bot_run.py"
+    restart: always
+
+  celery:
+    build: .
+    container_name: celery
+    command: celery -A admin_panel worker --loglevel=info
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+    env_file:
+      - .env
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    restart: always
+
+  redis:
+    image: redis:alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    restart: always
+  flower:
+    image: "mher/flower"
+    container_name: flower
+    command: celery --broker=redis://redis:6379/0 flower --port=5555
+    ports:
+      - "5555:5555"
+    depends_on:
+      - celery
+      - admin
+    env_file:
+      - .env
+  pgadmin:
+    container_name: pgadmin_container
+    image: dpage/pgadmin4:7.2
+    environment:
+      PGADMIN_DEFAULT_EMAIL: postgres@mail.com
+      PGADMIN_DEFAULT_PASSWORD: postgres
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    ports:
+      - "5050:80"
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1G
+    depends_on:
+      - postgres
+#    networks:
+#      - smbt_postgres_cont
+
+
+volumes:
+  static_volume:
+  media_volume:
+  potgresql-data:
+  pgadmin-data:
+
+
+#networks:
+#  smbt_postgres_cont:
+#    driver: bridge
