@@ -26,7 +26,6 @@ async def enter_address(callback: types.CallbackQuery, callback_data: CartConfir
         await db.close_pool()
 
     if address:
-        # Адрес уже есть, предлагаем подтвердить или изменить
         payments_data = Payments(sum=callback_data.sum)
         await state.update_data(sum=callback_data.sum)
         keyboard = InlineKeyboardMarkup(
@@ -45,7 +44,6 @@ async def enter_address(callback: types.CallbackQuery, callback_data: CartConfir
             reply_markup=keyboard
         )
     else:
-        # Если адреса нет, начинаем сбор данных
         await callback.message.answer("Введите название вашего города:")
         await state.update_data(sum=callback_data.sum)
         await state.set_state(AddressState.waiting_for_city)
@@ -86,7 +84,6 @@ async def process_apartment(message: types.Message, state: FSMContext):
         apartment = None
     await state.update_data(apartment=apartment)
 
-    # Подтверждение адреса
     data = await state.get_data()
     address = f"{data.get('city')}, {data.get('street')}, дом {data.get('house')}"
     if apartment:

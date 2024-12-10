@@ -9,7 +9,6 @@ from utils.db_utils import Database
 
 
 async def check_subscription(user_id, channel) -> bool:
-    """Проверка подписки пользователя на канал"""
     try:
         chat_member = await bot.get_chat_member(chat_id=channel, user_id=user_id)
         logging.debug(chat_member)
@@ -20,7 +19,6 @@ async def check_subscription(user_id, channel) -> bool:
 
 
 async def check_register(user_id:int) -> bool:
-    """Проверка регистрации пользователя на сервере"""
     db = Database(dsn=loader.dsn)
     try:
         await db.create_pool()

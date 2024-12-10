@@ -322,15 +322,12 @@ class Database:
 
 
     async def create_order(self, telegram_id):
-        # Получаем список товаров из корзины
         cart_items = await self.get_cart_items(telegram_id)
-        # Получаем текущий адрес пользователя
         address = await self.get_users_address(telegram_id)
 
         async with self.pool.acquire() as connection:
             async with connection.transaction():
                 try:
-                    # Получаем ID пользователя по telegram_id
                     user_id = await connection.fetchval(
                         """
                         SELECT id FROM users_telegramuser WHERE telegram_user_id = $1
@@ -338,7 +335,6 @@ class Database:
                         telegram_id
                     )
 
-                    # Создаем заказ и получаем его ID
                     order_id = await connection.fetchval(
                         """
                         INSERT INTO orders_order (status, created_at, user_id)
@@ -348,7 +344,6 @@ class Database:
                         'pending', datetime.now(), user_id
                     )
 
-                    # Добавляем товары в заказ
                     for item in cart_items:
                         product_id = item['product_id']
                         quantity = item['quantity']
@@ -360,7 +355,6 @@ class Database:
                             order_id, product_id, quantity
                         )
 
-                    # Добавляем адрес в заказ
                     await connection.execute(
                         """
                         INSERT INTO orders_orderaddress (order_id, city, street, house, apartment, user_id)

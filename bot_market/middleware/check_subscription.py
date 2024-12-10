@@ -12,20 +12,15 @@ class CheckSubscriptionMiddleware(BaseMiddleware):
         self.bot = bot
 
     async def __call__(self, handler, event: TelegramObject, data: dict):
-        """
-        Middleware вызывается перед обработкой события.
-        """
-        user_id = data['event_from_user'].id  # Получаем ID пользователя
+        user_id = data['event_from_user'].id
         try:
-            # Проверяем статус пользователя в канале
             chat_member = await self.bot.get_chat_member(chat_id=loader.CHANNEL_ID, user_id=user_id)
             if chat_member.status not in ['member', 'administrator', 'creator']:
-                # Если пользователь не подписан, отправляем уведомление
                 await self.bot.send_message(
                     chat_id=user_id,
-                    text="Пожалуйста, подпишитесь на наш канал, чтобы продолжить работу с ботом."
+                    text="Пожалуйста, подпишитесь на наш канал, чтобы продолжить работу с ботом.\n/start"
                 )
-                return  # Прерываем дальнейшую обработку
+                return
         except Exception as e:
             logging.error(f"Ошибка при проверке подписки: {e}")
             await self.bot.send_message(
@@ -34,5 +29,4 @@ class CheckSubscriptionMiddleware(BaseMiddleware):
             )
             return
 
-        # Если подписка есть, продолжаем выполнение хэндлера
         return await handler(event, data)

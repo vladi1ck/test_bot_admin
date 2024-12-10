@@ -12,7 +12,6 @@ from utils.db_utils import Database
 
 payments = Router()
 db = Database(loader.dsn)
-photo_path = "C:/Users/user/PycharmProjects/bot_admin/admin_panel/media/cart.png"
 
 @payments.callback_query(Payments.filter())
 async def show_cart(callback: CallbackQuery, callback_data: Payments):

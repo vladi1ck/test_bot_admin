@@ -13,17 +13,14 @@ class CheckRegistrationMiddleware(BaseMiddleware):
         self.bot = bot
 
     async def __call__(self, handler, event: TelegramObject, data: dict):
-        """
-        Middleware вызывается перед обработкой события.
-        """
-        user_id = data['event_from_user'].id  # Получаем ID пользователя
+        user_id = data['event_from_user'].id
         try:
             if not await check_register(user_id):
                 await self.bot.send_message(
                     chat_id=user_id,
                     text="Пожалуйста, пройди регистрацию, чтобы продолжить работу с ботом.\n/register"
                 )
-                return  # Прерываем дальнейшую обработку
+                return
         except Exception as e:
             logging.error(f"Ошибка при проверке подписки: {e}")
             await self.bot.send_message(

@@ -30,7 +30,6 @@ async def process_first_name(message: Message, state: FSMContext):
     await state.set_state(Registration.last_name)
 
 
-# Обработчик для состояния last
 @register.message(Registration.last_name)
 async def process_last_name(message: Message, state: FSMContext):
     await state.update_data(last_name=message.text)
@@ -38,7 +37,6 @@ async def process_last_name(message: Message, state: FSMContext):
     await state.set_state(Registration.phone)
 
 
-# Обработчик для состояния last_name
 @register.message(Registration.phone)
 async def process_phone(message: Message, state: FSMContext):
     await db.create_pool()

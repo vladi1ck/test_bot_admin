@@ -8,8 +8,12 @@ services:
       - .env
     ports:
       - "5432:5432"
-#    networks:
-#      - smbt_postgres
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
   admin:
     build:
       context: .
@@ -29,10 +33,15 @@ services:
     ports:
       - "8000:8000"
     restart: always
-
     command: >
       bash -c "python manage.py collectstatic --noinput && python manage.py makemigrations 
       && python manage.py migrate &&  python manage.py runserver 0.0.0.0:8000"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
 
   bot_market:
     build:
@@ -52,6 +61,12 @@ services:
     command: >
       bash -c "python bot_run.py"
     restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
 
   celery:
     build: .
@@ -67,6 +82,12 @@ services:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
     restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
 
   redis:
     image: redis:alpine
@@ -74,6 +95,13 @@ services:
     ports:
       - "6379:6379"
     restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+
   flower:
     image: "mher/flower"
     container_name: flower
@@ -85,6 +113,13 @@ services:
       - admin
     env_file:
       - .env
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+
   pgadmin:
     container_name: pgadmin_container
     image: dpage/pgadmin4:7.2
@@ -103,8 +138,12 @@ services:
           memory: 1G
     depends_on:
       - postgres
-#    networks:
-#      - smbt_postgres_cont
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
 
 
 volumes:
@@ -114,6 +153,3 @@ volumes:
   pgadmin-data:
 
 
-#networks:
-#  smbt_postgres_cont:
-#    driver: bridge

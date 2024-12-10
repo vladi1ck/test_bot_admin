@@ -66,8 +66,8 @@ async def handle_category(callback: CallbackQuery, callback_data: CategoryCbData
 
             await callback.message.edit_media(
                 media=types.InputMediaPhoto(
-                    media=photo_file,  # Абсолютный путь или URL к изображению
-                    caption="Выберите Подкатегорию:"  # Подпись к изображению
+                    media=photo_file,
+                    caption="Выберите Подкатегорию:"
                 ),
                 reply_markup=keyboard
             )
@@ -90,7 +90,6 @@ async def handle_page(callback: CallbackQuery, callback_data: CategoryPageCbData
     logging.debug('Сработал Обработчик пагинации')
     try:
         page = data
-        # Генерация клавиатуры для текущей страницы
         keyboard = await generate_category_keyboard(page=page,
                                                     dict_id=dict_id,
                                                     buttons_text=buttons_text,
@@ -100,8 +99,8 @@ async def handle_page(callback: CallbackQuery, callback_data: CategoryPageCbData
 
         await callback.message.edit_media(
             media=types.InputMediaPhoto(
-                media=photo_file,  # Абсолютный путь или URL к изображению
-                caption="Выберите категорию:"  # Подпись к изображению
+                media=photo_file,
+                caption="Выберите категорию:"
             ),
             reply_markup=keyboard
         )
@@ -138,8 +137,8 @@ async def handle_subcategory_page(callback: CallbackQuery, callback_data: SubCat
 
             await callback.message.edit_media(
                 media=types.InputMediaPhoto(
-                    media=photo_file,  # Абсолютный путь или URL к изображению
-                    caption="Выберите Подкатегорию:"  # Подпись к изображению
+                    media=photo_file,
+                    caption="Выберите Подкатегорию:"
                 ),
                 reply_markup=keyboard
             )

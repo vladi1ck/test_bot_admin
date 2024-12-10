@@ -1,34 +1,37 @@
-import asyncio
-import json
 import os
 
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
+from asgiref.sync import sync_to_async, async_to_sync
 from celery import shared_task
-from aiogram import Bot, types
-from django.conf import settings
+from aiogram import Bot
+
 from .models import Push
-from users.models import TelegramUser  # Модель пользователей с telegram_id
+from users.models import TelegramUser
 
-bot = Bot(token=os.getenv('BOT_TOKEN'),default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+bot = Bot(token=os.getenv('BOT_TOKEN'), default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 
-@shared_task
-def send_broadcast_message(push_id):
-    # Используем asyncio.run() для запуска асинхронных задач
-    asyncio.run(send_broadcast_message(push_id))
 
 @shared_task
-async def send_broadcast_message(push_id):
-    push = Push.objects.get(id=push_id)
-    users = TelegramUser.objects.values_list('telegram_user_id', flat=True)
+def send_broadcast_message_task(push_id):
+    async_to_sync(process_broadcast_message)(push_id)
 
+
+async def process_broadcast_message(push_id):
+    push = await sync_to_async(Push.objects.get)(id=push_id)
+
+    users = await sync_to_async(list)(
+        TelegramUser.objects.values_list('telegram_user_id', flat=True)
+    )
+    if await send_notify(users, push.text_message):
+        push.sent = True
+        await sync_to_async(push.save)()
+
+async def send_notify(users, notify):
     for user_id in users:
         try:
-            await bot.send_message(chat_id=user_id, text=json.dumps(push.message))
+            await bot.send_message(chat_id=user_id, text=notify)
+            return True
         except Exception as e:
-            # Логирование ошибки
-            print(f"Не удалось отправить сообщение пользователю {user_id}: {e}")
-
-    # Обновляем статус рассылки
-    push.sent = True
-    push.save()
+            print(f"Ошибка при отправке сообщения пользователю {user_id}: {e}")
+            return False

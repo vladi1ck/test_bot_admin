@@ -12,6 +12,7 @@ from utils.db_utils import Database
 
 db = Database(loader.dsn)
 products = Router()
+photo_path = loader.photo_path_menu
 
 @products.callback_query(SubCategoryCbData.filter())
 async def handle_product(callback: CallbackQuery, callback_data: SubCategoryCbData):
@@ -106,7 +107,7 @@ async def handle_back_to_menu(callback: CallbackQuery, callback_data: BackToMenu
         if callback.message.photo:
             await callback.message.edit_media(
                 media=types.InputMediaPhoto(
-                    media=FSInputFile("C:/Users/user/PycharmProjects/bot_admin/admin_panel/media/menu.jpg"),
+                    media=FSInputFile(photo_path),
                     caption="Выберите категорию:"  # Текст главного меню
                 ),
                 reply_markup=keyboard

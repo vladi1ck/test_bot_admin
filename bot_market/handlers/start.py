@@ -19,7 +19,6 @@ CHANNEL_ID = os.getenv('CHANNEL_ID')
 
 @start_router.message(CommandStart())
 async def start_handler(message: types.Message, state: FSMContext):
-    """Обработчик команды /start"""
     user_id = message.from_user.id
     is_subscribed = await check_subscription(user_id, channel=CHANNEL_ID)
     is_register = await check_register(user_id)
@@ -45,7 +44,6 @@ async def start_handler(message: types.Message, state: FSMContext):
 
 @start_router.callback_query(lambda call: call.data == "check_subscription")
 async def callback_check_subscription(call: types.CallbackQuery, state: FSMContext):
-    """Обработчик кнопки проверки подписки"""
     user_id = call.from_user.id
     is_subscribed = await check_subscription(user_id, channel=CHANNEL_ID)
     is_register = await check_register(user_id)

@@ -18,7 +18,6 @@ async def handle_product(callback: CallbackQuery, callback_data: ProductToCart):
 
     logging.debug('Сработал Обработчик Продукта в корзину')
     buttons_text, product_id, description_text, photo_url, price = await db.get_product_by_id(callback_data.id)
-    logging.debug(f'photo - {photo_url}')
     try:
         if callback_data.name:
             try:
@@ -35,9 +34,7 @@ async def handle_product(callback: CallbackQuery, callback_data: ProductToCart):
                                                            previous_menu_callback=True,
                                                            previous_menu_callback_name=page_data.pack()
                                                            )
-                logging.debug(len(messages))
                 msg = messages[0]
-                logging.debug(msg)
                 photo_path = msg["photo"]
                 photo_file = FSInputFile(photo_path[0])
                 await callback.message.edit_media(
@@ -51,11 +48,10 @@ async def handle_product(callback: CallbackQuery, callback_data: ProductToCart):
             finally:
                 await db.close_pool()
         else:
-            logging.exception("Ошибка при обработке кнопки 'Назад к меню'")
-            await callback.answer("Ошибка при возвращении в меню", show_alert=True)
+            await callback.answer("Ошибка при получении данных", show_alert=True)
     except:
-        logging.exception("Ошибка при обработке кнопки 'Назад к меню'")
-        await callback.answer("Ошибка при возвращении в меню", show_alert=True)
+        logging.exception("Ошибка")
+        await callback.answer("Ошибка", show_alert=True)
 
 
 @product_to_cart.callback_query(ProductToCartQuantity.filter())
@@ -65,7 +61,6 @@ async def handle_products_quantity(callback: CallbackQuery, callback_data: Produ
 
         logging.debug('Сработал Обработчик количества Продуктов в корзину')
         buttons_text, product_id, description_text, photo_url, price = await db.get_product_by_id(callback_data.id)
-        logging.debug(f'photo - {photo_url}')
         quantity =  callback_data.quantity
         if callback_data.command == -1:
             quantity-=1
@@ -90,9 +85,7 @@ async def handle_products_quantity(callback: CallbackQuery, callback_data: Produ
                                                            previous_menu_callback=True,
                                                            previous_menu_callback_name=page_data.pack()
                 )
-                logging.debug(len(messages))
                 msg = messages[0]
-                logging.debug(msg)
                 photo_path = msg["photo"]
                 photo_file = FSInputFile(photo_path[0])
                 await callback.message.edit_media(
@@ -106,8 +99,8 @@ async def handle_products_quantity(callback: CallbackQuery, callback_data: Produ
             finally:
                 await db.close_pool()
         else:
-            logging.exception("Ошибка при обработке кнопки 'Назад к меню'")
-            await callback.answer("Ошибка при возвращении в меню", show_alert=True)
+            logging.exception("Ошибка при получении данных'")
+            await callback.answer("Ошибка при получении данных", show_alert=True)
     except:
         logging.exception("Ошибка!")
         await callback.answer("Ошибка!", show_alert=True)
@@ -139,9 +132,7 @@ async def handle_products_quantity(callback: CallbackQuery, callback_data: Produ
                                                            previous_menu_callback=True,
                                                            previous_menu_callback_name=page_data.pack()
                 )
-                logging.debug(len(messages))
                 msg = messages[0]
-                logging.debug(msg)
                 photo_path = msg["photo"]
                 photo_file = FSInputFile(photo_path[0])
                 await callback.message.edit_media(
@@ -157,8 +148,8 @@ async def handle_products_quantity(callback: CallbackQuery, callback_data: Produ
         elif quantity == 0:
             await callback.answer("Количество должно быть отлично от 0", show_alert=True)
         else:
-            logging.exception("Ошибка при обработке кнопки 'Назад к меню'")
-            await callback.answer("Ошибка при возвращении в меню", show_alert=True)
+            logging.exception("Ошибка при получении данных")
+            await callback.answer("Ошибка при получении данных", show_alert=True)
     except:
         logging.exception("Ошибка!")
         await callback.answer("Ошибка!", show_alert=True)
