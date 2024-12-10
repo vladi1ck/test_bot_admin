@@ -2,6 +2,7 @@ import asyncio
 import logging
 import sys
 
+from handlers.faq import faq
 from handlers.cart import cart
 from handlers.confirm_order import confirm_order
 from handlers.payments import payments
@@ -24,6 +25,7 @@ async def main() -> None:
     dp.include_router(confirm_order)
     dp.include_router(cart)
     dp.include_router(payments)
+    dp.include_router(faq)
 
     catalog.message.middleware(CheckSubscriptionMiddleware(bot))
     catalog.message.middleware(CheckRegistrationMiddleware(bot))
@@ -36,6 +38,16 @@ async def main() -> None:
 
     product_to_cart.message.middleware(CheckSubscriptionMiddleware(bot))
     product_to_cart.message.middleware(CheckRegistrationMiddleware(bot))
+
+    confirm_order.message.middleware(CheckSubscriptionMiddleware(bot))
+    confirm_order.message.middleware(CheckRegistrationMiddleware(bot))
+
+    payments.message.middleware(CheckSubscriptionMiddleware(bot))
+    payments.message.middleware(CheckRegistrationMiddleware(bot))
+
+    faq.message.middleware(CheckSubscriptionMiddleware(bot))
+    faq.message.middleware(CheckRegistrationMiddleware(bot))
+
 
     await dp.start_polling(bot)
 

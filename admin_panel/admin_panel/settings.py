@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'orders.apps.OrdersConfig',
     'users.apps.UsersConfig',
     'push_from_bot.apps.PushFromBotConfig',
+    'faq.apps.FaqConfig',
 ]
 
 MIDDLEWARE = [

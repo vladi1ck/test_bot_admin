@@ -397,6 +397,17 @@ class Database:
                 except Exception as _ex:
                     logging.debug(_ex)
 
+    async def get_faq(self):
+        async with self.pool.acquire() as connection:
+            async with connection.transaction():
+                try:
+                    logging.debug("Executing SELECT name, answer FROM faq_faq")
+                    rows = await connection.fetch("SELECT name, answer FROM faq_faq")
+                    logging.debug(f"Fetched rows: {rows}")
+                    return {row['name']: row['answer'] for row in rows}
+                except Exception as _ex:
+                    logging.debug(_ex)
+
     async def close_pool(self):
         """Закрытие пула соединений."""
         if self.pool:
