@@ -58,4 +58,3 @@ async def successful_payment_handler(message: types.Message):
     else:
         await message.answer("Произошла ошибка, пожалуйста, повторите попытку.")
 
-

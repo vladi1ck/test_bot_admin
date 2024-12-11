@@ -16,11 +16,11 @@ photo_path = loader.photo_path_menu
 
 @products.callback_query(SubCategoryCbData.filter())
 async def handle_product(callback: CallbackQuery, callback_data: SubCategoryCbData):
-    await db.create_pool()
-
-    buttons_text, product_id, description_text,photo_url, price  = await db.get_products(callback_data.id)
-    logging.debug('Сработал Обработчик Продукта')
     try:
+        await db.create_pool()
+
+        buttons_text, product_id, description_text, photo_url, price = await db.get_products(callback_data.id)
+        logging.debug('Сработал Обработчик Продукта')
         if buttons_text:
             try:
                 page = 0
@@ -59,12 +59,13 @@ async def handle_product(callback: CallbackQuery, callback_data: SubCategoryCbDa
 @products.callback_query(ProductPageCbData.filter())
 async def handle_product(callback: CallbackQuery, callback_data: ProductPageCbData):
     await callback.answer()
-    await db.create_pool()
-
-    buttons_text, product_id, description_text,photo_url, price  = await db.get_products(callback_data.id)
-    logging.debug('Сработал Обработчик Продукта пагинации')
 
     try:
+        await db.create_pool()
+
+        buttons_text, product_id, description_text, photo_url, price = await db.get_products(callback_data.id)
+        logging.debug('Сработал Обработчик Продукта пагинации')
+
         page = callback_data.number
         page_data = CategoryPageCbData(number=0)
         messages = await generate_product_keyboard(page=page,
@@ -96,8 +97,9 @@ async def handle_product(callback: CallbackQuery, callback_data: ProductPageCbDa
 
 @products.callback_query(BackToMenu.filter())
 async def handle_back_to_menu(callback: CallbackQuery, callback_data: BackToMenu):
-    data = callback_data.name
+
     try:
+        data = callback_data.name
         await callback.answer()
 
         keyboard = InlineKeyboardMarkup(inline_keyboard=[

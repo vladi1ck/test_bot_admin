@@ -21,5 +21,8 @@ dp = Dispatcher()
 dsn = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD_LINK}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
 YOOKASSA_TOKEN = os.getenv('YOOKASSA_TOKEN')
 
+ITEM_PER_PAGE_CATEGORY = 3
+ITEM_PER_PAGE_SUBCATEGORY = 3
+
 photo_path_menu = "static/menu.jpg"
 photo_path_cart = "static/cart.png"

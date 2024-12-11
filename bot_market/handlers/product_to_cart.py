@@ -14,12 +14,11 @@ product_to_cart = Router()
 
 @product_to_cart.callback_query(ProductToCart.filter())
 async def handle_product(callback: CallbackQuery, callback_data: ProductToCart):
-    await db.create_pool()
-
     logging.debug('Сработал Обработчик Продукта в корзину')
     buttons_text, product_id, description_text, photo_url, price = await db.get_product_by_id(callback_data.id)
     try:
         if callback_data.name:
+            await db.create_pool()
             try:
                 page = 0
                 page_data = CategoryPageCbData(number=0)
@@ -96,14 +95,14 @@ async def handle_products_quantity(callback: CallbackQuery, callback_data: Produ
             except Exception as _ex:
                 logging.exception("Ошибка при обработке продукта")
                 await callback.answer("Ошибка! Попробуйте снова.", show_alert=True)
-            finally:
-                await db.close_pool()
         else:
             logging.exception("Ошибка при получении данных'")
             await callback.answer("Ошибка при получении данных", show_alert=True)
     except:
         logging.exception("Ошибка!")
         await callback.answer("Ошибка!", show_alert=True)
+    finally:
+        await db.close_pool()
 
 
 @product_to_cart.callback_query(ProductToCartQuantityConfirmation.filter())
@@ -143,8 +142,6 @@ async def handle_products_quantity(callback: CallbackQuery, callback_data: Produ
             except Exception as _ex:
                 logging.exception("Ошибка при обработке продукта")
                 await callback.answer("Ошибка! Попробуйте снова.", show_alert=True)
-            finally:
-                await db.close_pool()
         elif quantity == 0:
             await callback.answer("Количество должно быть отлично от 0", show_alert=True)
         else:
@@ -153,3 +150,5 @@ async def handle_products_quantity(callback: CallbackQuery, callback_data: Produ
     except:
         logging.exception("Ошибка!")
         await callback.answer("Ошибка!", show_alert=True)
+    finally:
+        await db.close_pool()

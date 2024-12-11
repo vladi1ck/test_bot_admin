@@ -1,3 +1,5 @@
+import logging
+
 from aiogram import Router
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
@@ -39,16 +41,20 @@ async def process_last_name(message: Message, state: FSMContext):
 
 @register.message(Registration.phone)
 async def process_phone(message: Message, state: FSMContext):
-    await db.create_pool()
-    user_data = await state.get_data()
-    first_name = user_data.get("first_name")
-    last_name = user_data.get('last_name')
-    phone = message.contact.phone_number
+    try:
+        await db.create_pool()
+        user_data = await state.get_data()
+        first_name = user_data.get("first_name")
+        last_name = user_data.get('last_name')
+        phone = message.contact.phone_number
 
-    await state.clear()
-    await db.insert_user_and_create_cart(telegram_id=message.from_user.id,
-                      first_name=first_name, last_name=last_name, phone=phone)
+        await state.clear()
+        await db.insert_user_and_create_cart(telegram_id=message.from_user.id,
+                          first_name=first_name, last_name=last_name, phone=phone)
 
-    await message.answer('Регистрация завершена успешно!\n '
-                         'Выберите действие из меню', reply_markup=await main_kb())
-    await db.close_pool()
+        await message.answer('Регистрация завершена успешно!\n '
+                             'Выберите действие из меню', reply_markup=await main_kb())
+    except Exception as _ex:
+        logging.debug(_ex)
+    finally:
+        await db.close_pool()

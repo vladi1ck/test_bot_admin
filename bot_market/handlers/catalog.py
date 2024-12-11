@@ -18,34 +18,38 @@ photo_path = loader.photo_path_menu
 
 @catalog.message(F.text == 'Каталог')
 async def show_categories(message: types.Message):
-    await db.create_pool()
-    page = 0
-    buttons_text, id = await db.get_categories()
-    dict_id = dict(zip(buttons_text, id))
-    keyboard = await generate_category_keyboard(page=page,
-                                                dict_id=dict_id,
-                                                buttons_text=buttons_text,
-                                                ITEMS_PER_PAGE=2)
+    try:
+        await db.create_pool()
+        page = 0
+        buttons_text, id = await db.get_categories()
+        dict_id = dict(zip(buttons_text, id))
+        keyboard = await generate_category_keyboard(page=page,
+                                                    dict_id=dict_id,
+                                                    buttons_text=buttons_text,
+                                                    ITEMS_PER_PAGE=2)
 
-    photo_file = FSInputFile(photo_path)
+        photo_file = FSInputFile(photo_path)
 
-    await message.answer_photo(
-        photo=photo_file,
-        caption="Выберите Категорию:",
-        reply_markup=keyboard
-    )
-    await db.close_pool()
+        await message.answer_photo(
+            photo=photo_file,
+            caption="Выберите Категорию:",
+            reply_markup=keyboard
+        )
+    except Exception as _ex:
+        logging.debug(_ex)
+    finally:
+        await db.close_pool()
 
 
 @catalog.callback_query(CategoryCbData.filter())
 async def handle_category(callback: CallbackQuery, callback_data: CategoryCbData):
-    await db.create_pool()
-    data = callback_data
-    logging.debug('Сработал Обработчик Подкатегории')
-    logging.debug(data)
-    buttons_text, id = await db.get_categories()
-    dict_id = dict(zip(buttons_text, id))
     try:
+        await db.create_pool()
+        data = callback_data
+        logging.debug('Сработал Обработчик Подкатегории')
+        logging.debug(data)
+        buttons_text, id = await db.get_categories()
+        dict_id = dict(zip(buttons_text, id))
         category_name = data.name
         subcategories, sub_id = await db.get_subcategories((dict_id[f'{category_name}']))
         dict_id_cub = dict(zip(subcategories, sub_id))
@@ -83,12 +87,12 @@ async def handle_category(callback: CallbackQuery, callback_data: CategoryCbData
 
 @catalog.callback_query(CategoryPageCbData.filter())
 async def handle_page(callback: CallbackQuery, callback_data: CategoryPageCbData):
-    await db.create_pool()
-    data = callback_data.number
-    buttons_text, id = await db.get_categories()
-    dict_id = dict(zip(buttons_text, id))
-    logging.debug('Сработал Обработчик пагинации')
     try:
+        await db.create_pool()
+        data = callback_data.number
+        buttons_text, id = await db.get_categories()
+        dict_id = dict(zip(buttons_text, id))
+        logging.debug('Сработал Обработчик пагинации')
         page = data
         keyboard = await generate_category_keyboard(page=page,
                                                     dict_id=dict_id,
@@ -110,12 +114,13 @@ async def handle_page(callback: CallbackQuery, callback_data: CategoryPageCbData
 
 @catalog.callback_query(SubCategoryPageCbData.filter())
 async def handle_subcategory_page(callback: CallbackQuery, callback_data: SubCategoryPageCbData):
-    await db.create_pool()
-    data = callback_data.number
-    buttons_text, id = await db.get_categories()
-    dict_id = dict(zip(buttons_text, id))
-    logging.debug('Сработал Обработчик пагинации Подкатегории')
+
     try:
+        await db.create_pool()
+        data = callback_data.number
+        buttons_text, id = await db.get_categories()
+        dict_id = dict(zip(buttons_text, id))
+        logging.debug('Сработал Обработчик пагинации Подкатегории')
         category_name = callback_data.name
         # logging.debug((dict_id[f'{category_name}']))
         subcategories, sub_id = await db.get_subcategories((dict_id[f'{category_name}']))

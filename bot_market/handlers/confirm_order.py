@@ -15,8 +15,9 @@ db = Database(loader.dsn)
 
 @confirm_order.callback_query(CartConfirmOrder.filter())
 async def enter_address(callback: types.CallbackQuery, callback_data: CartConfirmOrder, state: FSMContext):
-    await db.create_pool()
+
     try:
+        await db.create_pool()
         address = await db.get_users_address(callback.from_user.id)
     except Exception as ex:
         logging.error(f"Ошибка получения адреса пользователя: {ex}")

@@ -84,6 +84,7 @@ async def handle_back_to_menu_cart(callback: CallbackQuery, callback_data: Produ
     except Exception as e:
         logging.exception("Ошибка при обработке кнопки 'Назад к меню'")
         await callback.answer("Ошибка при возвращении в меню", show_alert=True)
+    finally:
         await db.close_pool()
 
 @cart.callback_query(CartDeleteItem.filter())
@@ -111,6 +112,7 @@ async def handle_delete_item_from_cart(callback: CallbackQuery, callback_data: C
     except Exception as e:
         logging.exception("Ошибка при обработке кнопки 'Назад к меню'")
         await callback.answer("Ошибка при возвращении в меню", show_alert=True)
+    finally:
         await db.close_pool()
 
 @cart.callback_query(CartChangeItem.filter())
@@ -150,6 +152,7 @@ async def handle_change_item_from_cart(callback: CallbackQuery, callback_data: C
     except Exception as e:
         logging.exception("Ошибка при обработке кнопки 'Назад к меню'")
         await callback.answer("Ошибка при возвращении в меню", show_alert=True)
+    finally:
         await db.close_pool()
 
 
@@ -254,6 +257,7 @@ async def handle_confirm_change_item_from_cart(callback: CallbackQuery, callback
     except Exception as e:
         logging.exception("Ошибка при обработке кнопки 'Назад к меню'")
         await callback.answer("Ошибка при возвращении в меню", show_alert=True)
+    finally:
         await db.close_pool()
 
 
