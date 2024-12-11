@@ -25,7 +25,7 @@ async def show_cart(callback: CallbackQuery, callback_data: Payments):
                                       currency='RUB',
                                       prices=[
                                           {
-                                          'label': 'Руб',
+                                          'label': 'Заказ',
                                           'amount': callback_data.sum*100,
                                           }
                                       ]

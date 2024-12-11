@@ -14,11 +14,12 @@ product_to_cart = Router()
 
 @product_to_cart.callback_query(ProductToCart.filter())
 async def handle_product(callback: CallbackQuery, callback_data: ProductToCart):
-    logging.debug('Сработал Обработчик Продукта в корзину')
-    buttons_text, product_id, description_text, photo_url, price = await db.get_product_by_id(callback_data.id)
     try:
+        await db.create_pool()
+        logging.debug('Сработал Обработчик Продукта в корзину')
+        buttons_text, product_id, description_text, photo_url, price = await db.get_product_by_id(callback_data.id)
         if callback_data.name:
-            await db.create_pool()
+
             try:
                 page = 0
                 page_data = CategoryPageCbData(number=0)
@@ -44,13 +45,14 @@ async def handle_product(callback: CallbackQuery, callback_data: ProductToCart):
             except Exception as _ex:
                 logging.exception("Ошибка при обработке продукта")
                 await callback.answer("Ошибка! Попробуйте снова.", show_alert=True)
-            finally:
-                await db.close_pool()
         else:
             await callback.answer("Ошибка при получении данных", show_alert=True)
     except:
         logging.exception("Ошибка")
         await callback.answer("Ошибка", show_alert=True)
+    finally:
+        await db.close_pool()
+
 
 
 @product_to_cart.callback_query(ProductToCartQuantity.filter())

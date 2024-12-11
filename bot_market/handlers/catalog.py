@@ -10,6 +10,8 @@ from keyboards.inline_kb import generate_category_keyboard
 from callbacks.callbacks import CategoryCbData, CategoryPageCbData, SubCategoryPageCbData
 from utils.db_utils import Database
 
+from loader import ITEM_PER_PAGE_CATEGORY, ITEM_PER_PAGE_SUBCATEGORY
+
 dotenv.load_dotenv()
 catalog = Router()
 db = Database(loader.dsn)
@@ -26,7 +28,7 @@ async def show_categories(message: types.Message):
         keyboard = await generate_category_keyboard(page=page,
                                                     dict_id=dict_id,
                                                     buttons_text=buttons_text,
-                                                    ITEMS_PER_PAGE=2)
+                                                    ITEMS_PER_PAGE=ITEM_PER_PAGE_CATEGORY)
 
         photo_file = FSInputFile(photo_path)
 
@@ -61,7 +63,7 @@ async def handle_category(callback: CallbackQuery, callback_data: CategoryCbData
                                                         buttons_text=subcategories,
                                                         dict_id=dict_id_cub,
                                                         subcategory=True,
-                                                        ITEMS_PER_PAGE=1,
+                                                        ITEMS_PER_PAGE=ITEM_PER_PAGE_SUBCATEGORY,
                                                         category_name=data.name,
                                                         previous_menu_callback=True,
                                                         previous_menu_callback_name=page_data.pack())
@@ -97,7 +99,7 @@ async def handle_page(callback: CallbackQuery, callback_data: CategoryPageCbData
         keyboard = await generate_category_keyboard(page=page,
                                                     dict_id=dict_id,
                                                     buttons_text=buttons_text,
-                                                    ITEMS_PER_PAGE=2)
+                                                    ITEMS_PER_PAGE=ITEM_PER_PAGE_CATEGORY)
 
         photo_file = FSInputFile(photo_path)
 
@@ -134,7 +136,7 @@ async def handle_subcategory_page(callback: CallbackQuery, callback_data: SubCat
                                                         dict_id=dict_id_cub,
                                                         subcategory=True,
                                                         category_name=callback_data.name,
-                                                        ITEMS_PER_PAGE=1,
+                                                        ITEMS_PER_PAGE=ITEM_PER_PAGE_SUBCATEGORY,
                                                         previous_menu_callback=True,
                                                         previous_menu_callback_name=page_data.pack())
 
